@@ -33,6 +33,7 @@ function Trading() {
   const [inputValue3, setInputValue3] = React.useState(0);
   const [opentotrade, setopentrade] = React.useState(true);
   const [diableInput, setDiableInput] = React.useState(false);
+  const [search, setSearch] = React.useState("");
   const [loader, setLoader] = React.useState(false);
   const [error, setError] = React.useState({
     show: false,
@@ -304,7 +305,6 @@ function Trading() {
                       <th>Coin</th>
                       <th>available</th>
                       <th>reserved</th>
-                      <th>reserved percent</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -313,7 +313,6 @@ function Trading() {
                         <td>{item[0]}</td>
                         <td>{item[1]}</td>
                         <td>{item[2]}</td>
-                        <td>{(item[2] / item[1]) * 100} %</td>
                       </tr>
                     ))}
                   </tbody>
@@ -337,6 +336,16 @@ function Trading() {
             <Accordion.Item eventKey="2">
               <Accordion.Header>Select Coin</Accordion.Header>
               <Accordion.Body className="overflow-auto mh-500px">
+                <InputGroup className="mb-3">
+                  <InputGroup.Text id="basic-addon3">
+                    search coin
+                  </InputGroup.Text>
+                  <FormControl
+                    id="basic-url"
+                    aria-describedby="basic-addon3"
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </InputGroup>
                 <Table striped bordered hover size="sm">
                   <thead>
                     <tr className="text-center">
@@ -346,23 +355,31 @@ function Trading() {
                     </tr>
                   </thead>
                   <tbody>
-                    {list.map((item) => (
-                      <tr className="text-center">
-                        <td>{item.symbol}</td>
-                        <td>{item.info}</td>
-                        <td>
-                          <Button
-                            variant="dark"
-                            onClick={() => {
-                              onClickSelectCoin(item.symbol, item.info);
-                            }}
-                            disabled={opentotrade}
-                          >
-                            select
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {list
+                      .filter((item) =>
+                        search === ""
+                          ? item
+                          : item.symbol
+                              .toLowerCase()
+                              .includes(search.toLowerCase()) && item
+                      )
+                      .map((item) => (
+                        <tr className="text-center">
+                          <td>{item.symbol}</td>
+                          <td>{item.info}</td>
+                          <td>
+                            <Button
+                              variant="dark"
+                              onClick={() => {
+                                onClickSelectCoin(item.symbol, item.info);
+                              }}
+                              disabled={opentotrade}
+                            >
+                              select
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </Table>
               </Accordion.Body>
@@ -371,7 +388,7 @@ function Trading() {
         </Col>
       </Row>
       {selectSymbol === "" ? (
-        <h2 className="text-center mt-4">Select Coin to tranfer</h2>
+        <h2 className="text-center mt-4">Select coin to trade</h2>
       ) : (
         <>
           <Row className="mt-2">
