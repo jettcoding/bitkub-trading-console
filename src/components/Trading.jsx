@@ -516,7 +516,7 @@ function Trading() {
                   <Row>
                     <Col className="mt-4">
                       <Button
-                        variant="info"
+                        variant="primary"
                         className="w-100"
                         onClick={() => {
                           setImageBg(image);
@@ -566,7 +566,7 @@ function Trading() {
                     <Col>
                       <Button
                         active
-                        variant="info"
+                        variant="primary"
                         className="w-100"
                         onClick={() => setShow(!show)}
                       >
@@ -581,6 +581,7 @@ function Trading() {
                             disabled={diableInput}
                             className="w-100"
                             onClick={() => getData(apiSecret, apiKey)}
+                            variant="success"
                           >
                             Submit
                           </Button>
@@ -677,7 +678,7 @@ function Trading() {
                             <td>
                               <Button
                                 active
-                                variant="info"
+                                variant="primary"
                                 onClick={() => {
                                   onClickSelectCoin(item.symbol, item.info);
                                 }}
@@ -857,7 +858,7 @@ function Trading() {
                       <FormControl
                         aria-label="Amount (to the nearest dollar)"
                         className="text-center"
-                        value={formatter.format(inputValue1)}
+                        value={inputValue1}
                         onChange={(e) => changeInputVal(e.target.value, 0)}
                         type="text"
                       />
@@ -877,9 +878,7 @@ function Trading() {
                         <FormControl
                           aria-label="Amount (to the nearest dollar)"
                           className="text-center"
-                          value={
-                            selectmarket ? 0 : formatter.format(inputValue2)
-                          }
+                          value={selectmarket ? 0 : inputValue2}
                           onChange={(e) => changeInputVal(e.target.value, 1)}
                           disabled={selectmarket}
                           type="text"
