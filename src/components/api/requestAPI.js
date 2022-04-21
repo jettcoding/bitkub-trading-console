@@ -123,6 +123,47 @@ export const sell = async (
   }
 };
 
+export const orderList = async (sercetkey, apikey, symbol) => {
+  const data = await hashData(sercetkey, {
+    sym: symbol,
+  });
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-BTK-APIKEY": apikey,
+  };
+  const response = await axios.post(sendUrl, {
+    method: "POST",
+    url: baseUrl + "/api/market/my-open-orders",
+    headers: headers,
+    data: data,
+  });
+  return response.data.result;
+};
+
+export const deleteOrder = async (sercetkey, apikey, hash) => {
+  const data = await hashData(sercetkey, {
+    hash: hash,
+  });
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-BTK-APIKEY": apikey,
+  };
+  const response = await axios.post(sendUrl, {
+    method: "POST",
+    url: baseUrl + "/api/market/cancel-order",
+    headers: headers,
+    data: data,
+  });
+  console.log(response.data);
+  if (response.data.error === 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const hashData = async (sercetkey, input_data = {}) => {
   const serverTs = await axios.post(sendUrl, {
     method: "GET",

@@ -1,0 +1,58 @@
+@import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+$backgroudIMG: var(--backgroudIMG);
+$primaryColor: var(--primary-color);
+$secondaryColor: var(--secondary-color);
+$successColor: var(--success-color);
+$dangerColor: var(--danger-color);
+
+// $theme-colors: (
+//   "primary": $primaryColor,
+//   "info": $secondaryColor,
+//   "success": $successColor,
+//   "danger": $dangerColor,
+// );
+@import "~bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+body {
+  font-family: "Prompt", sans-serif;
+}
+
+.bg-full {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.btn-primary,
+.btn-primary.active {
+  background-color: $primaryColor;
+  border-color: $primaryColor;
+}
+
+.btn-info,
+.btn-info.active {
+  background-color: $secondaryColor;
+  border-color: $secondaryColor;
+}
+
+.btn-success,
+.btn-success.active {
+  background-color: $successColor;
+  border-color: $successColor;
+}
+
+.btn-danger,
+.btn-danger.active {
+  background-color: $dangerColor;
+  border-color: $dangerColor;
+}
+
+.mh-500px {
+  max-height: 500px;
+}
+
+.fixed {
+  position: fixed !important;
+}

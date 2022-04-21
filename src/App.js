@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
+import "./App.scss";
 import Trading from "./components/Trading";
 import {
   BrowserRouter as Router,
