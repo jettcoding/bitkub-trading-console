@@ -51,6 +51,9 @@ function Trading() {
   const [colorSecondary, setColorSecondary] = React.useState("");
   const [colorSuccess, setColorSuccess] = React.useState("");
   const [colorDanger, setColorDanger] = React.useState("");
+  const [colorSelected, setColorSelected] = React.useState("");
+  const [colorUnselected, setColorUnselected] = React.useState("");
+  const [colorBar, setColorBar] = React.useState("");
   const [image, setImage] = React.useState("");
   const [showImage, setShowImage] = React.useState(
     "https://firebasestorage.googleapis.com/v0/b/event-web-a0b1c.appspot.com/o/images%2F1627892719605_1920x1080-ghost-white-solid-color-background.jpg?alt=media&token=8bd6db46-0085-4386-a486-cb2390e807d8"
@@ -100,6 +103,27 @@ function Trading() {
         .querySelector("html")
         .style.setProperty("--danger-color", color.danger);
       localStorage.setItem("danger-color", color.danger);
+    }
+    if (color.selected) {
+      setColorSelected(color.selected);
+      document
+        .querySelector("html")
+        .style.setProperty("--selected-color", color.selected);
+      localStorage.setItem("selected-color", color.selected);
+    }
+    if (color.unselected) {
+      setColorUnselected(color.unselected);
+      document
+        .querySelector("html")
+        .style.setProperty("--unselected-color", color.unselected);
+      localStorage.setItem("unselected-color", color.unselected);
+    }
+    if (color.bar) {
+      setColorBar(color.bar);
+      document
+        .querySelector("html")
+        .style.setProperty("--bar-color", color.bar);
+      localStorage.setItem("bar-color", color.bar);
     }
   };
 
@@ -360,22 +384,34 @@ function Trading() {
       const check_color_secondary = localStorage.getItem("secondary-color");
       const check_color_success = localStorage.getItem("success-color");
       const check_color_danger = localStorage.getItem("danger-color");
+      const check_color_selected = localStorage.getItem("selected-color");
+      const check_color_unselected = localStorage.getItem("unselected-color");
+      const check_color_bar = localStorage.getItem("bar-color");
       const check_image = localStorage.getItem("image");
       if (
         check_color_primary !== null &&
         check_color_secondary !== null &&
         check_color_success !== null &&
         check_color_danger !== null &&
+        check_color_selected !== null &&
+        check_color_unselected !== null &&
+        check_color_bar !== null &&
         check_color_primary !== "" &&
         check_color_secondary !== "" &&
         check_color_success !== "" &&
-        check_color_danger !== ""
+        check_color_danger !== "" &&
+        check_color_selected !== "" &&
+        check_color_unselected !== "" &&
+        check_color_bar !== ""
       ) {
         setColor({
           primary: check_color_primary,
           secondary: check_color_secondary,
           success: check_color_success,
           danger: check_color_danger,
+          selected: check_color_selected,
+          unselected: check_color_unselected,
+          bar: check_color_bar,
         });
       } else {
         setColor({
@@ -383,6 +419,9 @@ function Trading() {
           secondary: "#ffffff",
           success: "#ffffff",
           danger: "#ffffff",
+          selected: "#ffffff",
+          unselected: "#ffffff",
+          bar: "#ffffff",
         });
       }
       if (check_image !== null && check_image !== "") {
@@ -498,6 +537,48 @@ function Trading() {
                       />
                     </Col>
                   </Row>
+                  <Row className="mt-2">
+                    <Col>
+                      <Form.Label htmlFor="exampleColorInput">
+                        Selected
+                      </Form.Label>
+                      <Form.Control
+                        type="color"
+                        id="exampleColorInput"
+                        defaultValue={colorSelected}
+                        onChange={(e) => setColorSelected(e.target.value)}
+                        value={colorSelected}
+                        title="Choose your color"
+                        className="w-100"
+                      />
+                    </Col>
+                    <Col>
+                      <Form.Label htmlFor="exampleColorInput">
+                        Unselected
+                      </Form.Label>
+                      <Form.Control
+                        type="color"
+                        id="exampleColorInput"
+                        defaultValue={colorUnselected}
+                        onChange={(e) => setColorUnselected(e.target.value)}
+                        value={colorUnselected}
+                        title="Choose your color"
+                        className="w-100"
+                      />
+                    </Col>
+                    <Col>
+                      <Form.Label htmlFor="exampleColorInput">Bar</Form.Label>
+                      <Form.Control
+                        type="color"
+                        id="exampleColorInput"
+                        defaultValue={colorBar}
+                        onChange={(e) => setColorBar(e.target.value)}
+                        value={colorBar}
+                        title="Choose your color"
+                        className="w-100"
+                      />
+                    </Col>
+                  </Row>
                   <Row>
                     <Col className="w-100 mt-2">
                       <Form.Label htmlFor="inputPassword5">
@@ -525,6 +606,9 @@ function Trading() {
                             secondary: colorSecondary,
                             success: colorSuccess,
                             danger: colorDanger,
+                            selected: colorSelected,
+                            unselected: colorUnselected,
+                            bar: colorBar,
                           });
                         }}
                         active
@@ -678,7 +762,7 @@ function Trading() {
                             <td>
                               <Button
                                 active
-                                variant="primary"
+                                variant="info"
                                 onClick={() => {
                                   onClickSelectCoin(item.symbol, item.info);
                                 }}
@@ -778,14 +862,14 @@ function Trading() {
                     <ButtonGroup aria-label="Basic example" className="w-100">
                       <Button
                         active
-                        variant={select === "buy" ? "success" : "info"}
+                        variant={select === "buy" ? "success" : "unselected"}
                         onClick={() => setSelectpush("buy")}
                       >
                         Buy
                       </Button>
                       <Button
                         active
-                        variant={select === "sell" ? "danger" : "info"}
+                        variant={select === "sell" ? "danger" : "unselected"}
                         onClick={() => setSelectpush("sell")}
                       >
                         Sell
@@ -799,7 +883,7 @@ function Trading() {
                       <Button
                         active
                         className="w-50"
-                        variant={selectmarket ? "info" : "primary"}
+                        variant={selectmarket ? "unselected" : "selected"}
                         onClick={() => setSelectMarketpush(false)}
                       >
                         Limit
@@ -807,7 +891,7 @@ function Trading() {
                       <Button
                         active
                         className="w-50"
-                        variant={!selectmarket ? "info" : "primary"}
+                        variant={!selectmarket ? "unselected" : "selected"}
                         onClick={() => setSelectMarketpush(true)}
                       >
                         Market
@@ -818,28 +902,28 @@ function Trading() {
                     <ButtonGroup aria-label="Basic example" className="w-100">
                       <Button
                         active
-                        variant={persent === 25 ? "primary" : "info"}
+                        variant={persent === 25 ? "selected" : "unselected"}
                         onClick={() => selectPersent(25)}
                       >
                         25%
                       </Button>
                       <Button
                         active
-                        variant={persent === 50 ? "primary" : "info"}
+                        variant={persent === 50 ? "selected" : "unselected"}
                         onClick={() => selectPersent(50)}
                       >
                         50%
                       </Button>
                       <Button
                         active
-                        variant={persent === 75 ? "primary" : "info"}
+                        variant={persent === 75 ? "selected" : "unselected"}
                         onClick={() => selectPersent(75)}
                       >
                         75%
                       </Button>
                       <Button
                         active
-                        variant={persent === 100 ? "primary" : "info"}
+                        variant={persent === 100 ? "selected" : "unselected"}
                         onClick={() => selectPersent(100)}
                       >
                         100%

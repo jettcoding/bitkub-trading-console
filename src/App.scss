@@ -5,12 +5,10 @@ $secondaryColor: var(--secondary-color);
 $successColor: var(--success-color);
 $dangerColor: var(--danger-color);
 
-// $theme-colors: (
-//   "primary": $primaryColor,
-//   "info": $secondaryColor,
-//   "success": $successColor,
-//   "danger": $dangerColor,
-// );
+$barColor: var(--bar-color);
+$selectedColor: var(--selected-color);
+$unselectedColor: var(--unselected-color);
+
 @import "~bootstrap/scss/bootstrap";
 @import "../node_modules/bootstrap/scss/functions";
 @import "../node_modules/bootstrap/scss/variables";
@@ -49,10 +47,27 @@ body {
   border-color: $dangerColor;
 }
 
+.btn-selected,
+.btn-selected.active {
+  background-color: $selectedColor;
+  border-color: $selectedColor;
+}
+
+.btn-unselected,
+.btn-unselected.active {
+  background-color: $unselectedColor;
+  border-color: $unselectedColor;
+}
+
 .mh-500px {
   max-height: 500px;
 }
 
 .fixed {
   position: fixed !important;
+}
+
+.accordion-button {
+  background-color: $barColor !important;
+  color: black !important;
 }
