@@ -138,7 +138,7 @@ export const orderList = async (sercetkey, apikey, symbol) => {
     headers: headers,
     data: data,
   });
-  console.log(response.data);
+  // console.log(response.data);
   return response.data.result;
 };
 

@@ -228,7 +228,7 @@ function Trading() {
         setInputValue3(inputValue1 / value);
         setInputValue2(value);
       } else {
-        setInputValue3(value * price);
+        setInputValue3(value * inputValue1);
         setInputValue2(value);
       }
     } else if (index === 2) {
@@ -367,6 +367,18 @@ function Trading() {
     }
   };
 
+  const showDate = (time) => {
+    const date = new Date(time * 1000);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hour = date.getHours();
+    const min = date.getMinutes();
+    const sec = date.getSeconds();
+    const timeStr = `${year}-${month}-${day} ${hour}:${min}:${sec}`;
+    return timeStr;
+  };
+
   React.useEffect(() => {
     if (list.length === 0) {
       setListCoin();
@@ -415,13 +427,13 @@ function Trading() {
         });
       } else {
         setColor({
-          primary: "#ffffff",
-          secondary: "#ffffff",
-          success: "#ffffff",
-          danger: "#ffffff",
-          selected: "#ffffff",
-          unselected: "#ffffff",
-          bar: "#ffffff",
+          primary: "#ffeea8",
+          secondary: "#fec3df",
+          success: "#a0f3ed",
+          danger: "#ff89bf",
+          selected: "#ffeea8",
+          unselected: "#bdc0f7",
+          bar: "#ff89bf",
         });
       }
       if (check_image !== null && check_image !== "") {
@@ -690,40 +702,48 @@ function Trading() {
               </Accordion.Item>
               <Accordion.Item eventKey="2">
                 <Accordion.Header>Wallet</Accordion.Header>
-                <Accordion.Body>
-                  <Table striped bordered hover size="sm">
-                    <thead>
-                      <tr className="text-center">
-                        <th>Coin</th>
-                        <th>available</th>
-                        <th>reserved</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {wallet.map((item) => (
+                {!opentotrade ? (
+                  <Accordion.Body>
+                    <Table striped bordered hover size="sm">
+                      <thead>
                         <tr className="text-center">
-                          <td>{item[0]}</td>
-                          <td>{formatter.format(item[1])}</td>
-                          <td>{formatter.format(item[2])}</td>
+                          <th>Coin</th>
+                          <th>available</th>
+                          <th>reserved</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                  {!loader ? (
-                    <Button
-                      active
-                      variant="primary"
-                      onClick={fetchData}
-                      className="w-100"
-                    >
-                      Refresh Data
-                    </Button>
-                  ) : (
-                    <div className="mx-auto" style={{ width: "10%" }}>
-                      <Spinner animation="border" />
-                    </div>
-                  )}
-                </Accordion.Body>
+                      </thead>
+                      <tbody>
+                        {wallet.map((item) => (
+                          <tr className="text-center">
+                            <td>{item[0]}</td>
+                            <td>{formatter.format(item[1])}</td>
+                            <td>{formatter.format(item[2])}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                    {!loader ? (
+                      <Button
+                        active
+                        variant="primary"
+                        onClick={fetchData}
+                        className="w-100"
+                      >
+                        Refresh Data
+                      </Button>
+                    ) : (
+                      <div className="mx-auto" style={{ width: "10%" }}>
+                        <Spinner animation="border" />
+                      </div>
+                    )}
+                  </Accordion.Body>
+                ) : (
+                  <Accordion.Body>
+                    <h4 className="text-center">
+                      Please enter api key and api secret to see your wallet
+                    </h4>
+                  </Accordion.Body>
+                )}
               </Accordion.Item>
               <Accordion.Item eventKey="3">
                 <Accordion.Header>Select Coin</Accordion.Header>
@@ -803,7 +823,7 @@ function Trading() {
                             <td>{formatter.format(item.rate)}</td>
                             <td>{formatter.format(item.amount)}</td>
                             <td>{item.fee}</td>
-                            <td>{formatter.format(item.receive)}</td>
+                            <td>{showDate(item.ts)}</td>
                             <td>
                               <Button
                                 active
@@ -844,181 +864,184 @@ function Trading() {
             </Accordion>
           </Col>
         </Row>
-        <Row>
-          <Col className="bg-white m-2 p-2 rounded-3">
-            {selectSymbol === "" ? (
-              <h2 className="text-center mt-4">Select coin to trade</h2>
-            ) : (
-              <>
-                <Row className="mt-2">
-                  <Col>
-                    <h5>
-                      {info} : {formatter.format(price)}
-                    </h5>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <ButtonGroup aria-label="Basic example" className="w-100">
-                      <Button
-                        active
-                        variant={select === "buy" ? "success" : "unselected"}
-                        onClick={() => setSelectpush("buy")}
-                      >
-                        Buy
-                      </Button>
-                      <Button
-                        active
-                        variant={select === "sell" ? "danger" : "unselected"}
-                        onClick={() => setSelectpush("sell")}
-                      >
-                        Sell
-                      </Button>
-                    </ButtonGroup>
-                  </Col>
-                </Row>
-                <Row className="mt-2" id="trade">
-                  <Col>
-                    <ButtonGroup aria-label="Basic example" className="w-100">
-                      <Button
-                        active
-                        className="w-50"
-                        variant={selectmarket ? "unselected" : "selected"}
-                        onClick={() => setSelectMarketpush(false)}
-                      >
-                        Limit
-                      </Button>
-                      <Button
-                        active
-                        className="w-50"
-                        variant={!selectmarket ? "unselected" : "selected"}
-                        onClick={() => setSelectMarketpush(true)}
-                      >
-                        Market
-                      </Button>
-                    </ButtonGroup>
-                  </Col>
-                  <Col>
-                    <ButtonGroup aria-label="Basic example" className="w-100">
-                      <Button
-                        active
-                        variant={persent === 25 ? "selected" : "unselected"}
-                        onClick={() => selectPersent(25)}
-                      >
-                        25%
-                      </Button>
-                      <Button
-                        active
-                        variant={persent === 50 ? "selected" : "unselected"}
-                        onClick={() => selectPersent(50)}
-                      >
-                        50%
-                      </Button>
-                      <Button
-                        active
-                        variant={persent === 75 ? "selected" : "unselected"}
-                        onClick={() => selectPersent(75)}
-                      >
-                        75%
-                      </Button>
-                      <Button
-                        active
-                        variant={persent === 100 ? "selected" : "unselected"}
-                        onClick={() => selectPersent(100)}
-                      >
-                        100%
-                      </Button>
-                    </ButtonGroup>
-                  </Col>
-                </Row>
-                <Row className="mt-2">
-                  <Col>
-                    <InputGroup>
-                      <InputGroup.Text className="w-25">
-                        {select === "buy"
-                          ? "เงินที่ต้องการจ่าย"
-                          : "เหรียญที่ต้องการขาย"}
-                      </InputGroup.Text>
-                      <FormControl
-                        aria-label="Amount (to the nearest dollar)"
-                        className="text-center"
-                        value={inputValue1}
-                        onChange={(e) => changeInputVal(e.target.value, 0)}
-                        type="text"
-                      />
-                      <InputGroup.Text className="w-25">
-                        {selectSymbol.split("_")[select === "buy" ? 0 : 1]}
-                      </InputGroup.Text>
-                    </InputGroup>
-                  </Col>
-                </Row>
-                {!selectmarket && (
-                  <Row className="mt-1">
+        {orderListLoader ? (
+          <div className="mx-auto" style={{ width: "10%" }}>
+            <Spinner animation="border" />
+          </div>
+        ) : (
+          <Row>
+            <Col className="bg-white m-2 p-2 rounded-3">
+              {selectSymbol === "" ? (
+                <h2 className="text-center mt-4">Select coin to trade</h2>
+              ) : (
+                <>
+                  <Row className="mt-2">
+                    <Col>
+                      <h5>
+                        {info} : {formatter.format(price)}
+                      </h5>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <ButtonGroup aria-label="Basic example" className="w-100">
+                        <Button
+                          active
+                          variant={select === "buy" ? "success" : "unselected"}
+                          onClick={() => setSelectpush("buy")}
+                        >
+                          Buy
+                        </Button>
+                        <Button
+                          active
+                          variant={select === "sell" ? "danger" : "unselected"}
+                          onClick={() => setSelectpush("sell")}
+                        >
+                          Sell
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                  </Row>
+                  <Row className="mt-2" id="trade">
+                    <Col>
+                      <ButtonGroup aria-label="Basic example" className="w-100">
+                        <Button
+                          active
+                          className="w-50"
+                          variant={selectmarket ? "unselected" : "selected"}
+                          onClick={() => setSelectMarketpush(false)}
+                        >
+                          Limit
+                        </Button>
+                        <Button
+                          active
+                          className="w-50"
+                          variant={!selectmarket ? "unselected" : "selected"}
+                          onClick={() => setSelectMarketpush(true)}
+                        >
+                          Market
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                    <Col>
+                      <ButtonGroup aria-label="Basic example" className="w-100">
+                        <Button
+                          active
+                          variant={persent === 25 ? "selected" : "unselected"}
+                          onClick={() => selectPersent(25)}
+                        >
+                          25%
+                        </Button>
+                        <Button
+                          active
+                          variant={persent === 50 ? "selected" : "unselected"}
+                          onClick={() => selectPersent(50)}
+                        >
+                          50%
+                        </Button>
+                        <Button
+                          active
+                          variant={persent === 75 ? "selected" : "unselected"}
+                          onClick={() => selectPersent(75)}
+                        >
+                          75%
+                        </Button>
+                        <Button
+                          active
+                          variant={persent === 100 ? "selected" : "unselected"}
+                          onClick={() => selectPersent(100)}
+                        >
+                          100%
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                  </Row>
+                  <Row className="mt-2">
                     <Col>
                       <InputGroup>
                         <InputGroup.Text className="w-25">
-                          {select === "buy" ? "ราคาซื้อ" : "ราคาขาย"}
+                          {select === "buy"
+                            ? "เงินที่ต้องการจ่าย"
+                            : "เหรียญที่ต้องการขาย"}
                         </InputGroup.Text>
                         <FormControl
                           aria-label="Amount (to the nearest dollar)"
                           className="text-center"
-                          value={selectmarket ? 0 : inputValue2}
-                          onChange={(e) => changeInputVal(e.target.value, 1)}
-                          disabled={selectmarket}
+                          value={inputValue1}
+                          onChange={(e) => changeInputVal(e.target.value, 0)}
                           type="text"
                         />
                         <InputGroup.Text className="w-25">
-                          {selectSymbol.replace("_", "/")}
+                          {selectSymbol.split("_")[select === "buy" ? 0 : 1]}
                         </InputGroup.Text>
                       </InputGroup>
                     </Col>
                   </Row>
-                )}
+                  {!selectmarket && (
+                    <Row className="mt-1">
+                      <Col>
+                        <InputGroup>
+                          <InputGroup.Text className="w-25">
+                            {select === "buy" ? "ราคาซื้อ" : "ราคาขาย"}
+                          </InputGroup.Text>
+                          <FormControl
+                            aria-label="Amount (to the nearest dollar)"
+                            className="text-center"
+                            value={selectmarket ? 0 : inputValue2}
+                            onChange={(e) => changeInputVal(e.target.value, 1)}
+                            disabled={selectmarket}
+                            type="text"
+                          />
+                          <InputGroup.Text className="w-25">
+                            {selectSymbol.replace("_", "/")}
+                          </InputGroup.Text>
+                        </InputGroup>
+                      </Col>
+                    </Row>
+                  )}
 
-                <Row className="mt-1">
-                  <Col>
-                    <InputGroup>
-                      <InputGroup.Text className="w-25">
-                        {select === "buy"
-                          ? "เหรียญที่จะได้รับ"
-                          : "เงินที่จะได้รับ"}
-                      </InputGroup.Text>
-                      <FormControl
-                        aria-label="Amount (to the nearest dollar)"
-                        className="text-center"
-                        value={
-                          (selectmarket ? "≈" : "") +
-                          `${formatter.format(inputValue3)}`
-                        }
-                        onChange={(e) => changeInputVal(e.target.value, 2)}
-                        disabled
-                      />
-                      <InputGroup.Text className="w-25">
-                        {selectSymbol.split("_")[select === "buy" ? 1 : 0]}
-                      </InputGroup.Text>
-                    </InputGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <ButtonGroup
-                      aria-label="Basic example"
-                      className="w-100 mt-2 mb-4"
-                    >
-                      <Button
-                        active
-                        onClick={onClickToTrade}
-                        variant={select === "buy" ? "success" : "danger"}
+                  <Row className="mt-1">
+                    <Col>
+                      <InputGroup>
+                        <InputGroup.Text className="w-25">
+                          {select === "buy"
+                            ? "เหรียญที่จะได้รับ"
+                            : "เงินที่จะได้รับ"}
+                        </InputGroup.Text>
+                        <FormControl
+                          aria-label="Amount (to the nearest dollar)"
+                          className="text-center"
+                          value={(selectmarket ? "≈" : "") + `${inputValue3}`}
+                          onChange={(e) => changeInputVal(e.target.value, 2)}
+                          disabled
+                        />
+                        <InputGroup.Text className="w-25">
+                          {selectSymbol.split("_")[select === "buy" ? 1 : 0]}
+                        </InputGroup.Text>
+                      </InputGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <ButtonGroup
+                        aria-label="Basic example"
+                        className="w-100 mt-2 mb-4"
                       >
-                        {select}
-                      </Button>
-                    </ButtonGroup>
-                  </Col>
-                </Row>
-              </>
-            )}
-          </Col>
-        </Row>
+                        <Button
+                          active
+                          onClick={onClickToTrade}
+                          variant={select === "buy" ? "success" : "danger"}
+                        >
+                          {select}
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </Col>
+          </Row>
+        )}
 
         <ToastContainer
           className="p-3 fixed"
