@@ -889,9 +889,17 @@ function Trading() {
                           <tr className="text-center">
                             <td>{item.side}</td>
                             <td>{item.type}</td>
-                            <td>{formatter.format(item.rate)}</td>
-                            <td>{formatter.format(item.amount)}</td>
-                            <td>{formatter.format(item.receive)}</td>
+                            <td>{`${formatter.format(item.rate)} THB`}</td>
+                            <td>{`${formatter.format(item.amount)} ${
+                              selectSymbol.split("_")[
+                                item.side === "SELL" ? 1 : 0
+                              ]
+                            }`}</td>
+                            <td>{`${formatter.format(item.receive)} ${
+                              selectSymbol.split("_")[
+                                item.side === "SELL" ? 0 : 1
+                              ]
+                            }`}</td>
                             <td>{showDate(item.ts)}</td>
                             <td>
                               <Button
