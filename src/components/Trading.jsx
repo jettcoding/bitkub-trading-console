@@ -58,6 +58,7 @@ function Trading() {
   const [showImage, setShowImage] = React.useState(
     "https://firebasestorage.googleapis.com/v0/b/event-web-a0b1c.appspot.com/o/images%2F1627892719605_1920x1080-ghost-white-solid-color-background.jpg?alt=media&token=8bd6db46-0085-4386-a486-cb2390e807d8"
   );
+  const [favorite, setFavorite] = React.useState([]);
   const [error, setError] = React.useState({
     show: false,
     headermsg: "",
@@ -379,6 +380,21 @@ function Trading() {
     return timeStr;
   };
 
+  const addFevorite = async (symbol, check) => {
+    let newFevorite = favorite;
+    if (check) {
+      setFavorite([...newFevorite, symbol]);
+      localStorage.setItem(
+        "favorite",
+        JSON.stringify([...newFevorite, symbol])
+      );
+    } else {
+      newFevorite = favorite.filter((item) => item !== symbol);
+      setFavorite(newFevorite);
+      localStorage.setItem("favorite", JSON.stringify(newFevorite));
+    }
+  };
+
   React.useEffect(() => {
     if (list.length === 0) {
       setListCoin();
@@ -473,6 +489,15 @@ function Trading() {
       }
     }
   }, [apiKey, apiSecret]);
+
+  React.useEffect(() => {
+    if (favorite.length === 0) {
+      const check_favorite = localStorage.getItem("favorite");
+      if (check_favorite !== null && check_favorite !== "") {
+        setFavorite(JSON.parse(check_favorite));
+      }
+    }
+  }, [setFavorite, favorite.length]);
 
   if (
     colorPrimary === "" &&
@@ -761,6 +786,7 @@ function Trading() {
                   <Table striped bordered hover size="sm">
                     <thead>
                       <tr className="text-center">
+                        <th></th>
                         <th>Coin</th>
                         <th>info</th>
                         <th></th>
@@ -768,6 +794,7 @@ function Trading() {
                     </thead>
                     <tbody>
                       {list
+                        .filter((item) => favorite.includes(item.symbol))
                         .filter((item) =>
                           search === ""
                             ? item
@@ -777,6 +804,48 @@ function Trading() {
                         )
                         .map((item) => (
                           <tr className="text-center">
+                            <td>
+                              <i
+                                style={{ cursor: "pointer" }}
+                                class="bi bi-star-fill"
+                                onClick={() => addFevorite(item.symbol, false)}
+                              ></i>
+                            </td>
+                            <td>{item.symbol}</td>
+
+                            <td>{item.info}</td>
+                            <td>
+                              <Button
+                                active
+                                variant="info"
+                                onClick={() => {
+                                  onClickSelectCoin(item.symbol, item.info);
+                                }}
+                                disabled={opentotrade}
+                              >
+                                select
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      {list
+                        .filter((item) => !favorite.includes(item.symbol))
+                        .filter((item) =>
+                          search === ""
+                            ? item
+                            : item.symbol
+                                .toLowerCase()
+                                .includes(search.toLowerCase()) && item
+                        )
+                        .map((item) => (
+                          <tr className="text-center">
+                            <td>
+                              <i
+                                style={{ cursor: "pointer" }}
+                                class="bi bi-star"
+                                onClick={() => addFevorite(item.symbol, true)}
+                              ></i>
+                            </td>
                             <td>{item.symbol}</td>
                             <td>{item.info}</td>
                             <td>
@@ -810,7 +879,7 @@ function Trading() {
                           <th>Type</th>
                           <th>Rate</th>
                           <th>Amount</th>
-                          <th>Fee</th>
+                          <th>receive</th>
                           <th>time</th>
                           <th></th>
                         </tr>
@@ -822,7 +891,7 @@ function Trading() {
                             <td>{item.type}</td>
                             <td>{formatter.format(item.rate)}</td>
                             <td>{formatter.format(item.amount)}</td>
-                            <td>{item.fee}</td>
+                            <td>{formatter.format(item.receive)}</td>
                             <td>{showDate(item.ts)}</td>
                             <td>
                               <Button
