@@ -157,7 +157,7 @@ export const deleteOrder = async (sercetkey, apikey, hash) => {
     headers: headers,
     data: data,
   });
-  console.log(response.data);
+  // console.log(response.data);
   if (response.data.error === 0) {
     return true;
   } else {

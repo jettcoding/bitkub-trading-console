@@ -53,6 +53,7 @@ function Trading() {
   const [colorDanger, setColorDanger] = React.useState("");
   const [colorSelected, setColorSelected] = React.useState("");
   const [colorUnselected, setColorUnselected] = React.useState("");
+  const [changeOrderLoading, setChangeOrderLoading] = React.useState(false);
   const [colorBar, setColorBar] = React.useState("");
   const [image, setImage] = React.useState("");
   const [showImage, setShowImage] = React.useState(
@@ -193,7 +194,11 @@ function Trading() {
     await funcSetPrice(selectSymbol, persent, select, selectmarket);
   };
 
-  const changeInputVal = async (value, index) => {
+  const changeInputVal = async (val, index) => {
+    const value = val
+      .replace(",", "")
+      .replace(/[a-z]/g, "")
+      .replace(/[A-Z]]/g, "");
     if (index === 0) {
       if (select === "buy") {
         const thai_baht_fill = wallet.filter((item) => item[0] === "THB");
@@ -368,6 +373,50 @@ function Trading() {
     }
   };
 
+  const changeOrder = async (hash, side, rate, amount, change) => {
+    setChangeOrderLoading(true);
+    await deleteOrder(apiSecret, apiKey, hash);
+    let status;
+    const cal_rate = parseFloat(rate) + parseFloat(change);
+    // console.log(side, rate, amount, change);
+    // console.log(cal_rate);
+    if (side === "BUY") {
+      status = await buy(
+        selectSymbol,
+        apiSecret,
+        apiKey,
+        "limit",
+        parseFloat(amount),
+        cal_rate >= 0 ? cal_rate : cal_rate * -1
+      );
+    } else {
+      status = await sell(
+        selectSymbol,
+        apiSecret,
+        apiKey,
+        "limit",
+        parseFloat(amount),
+        cal_rate >= 0 ? cal_rate : cal_rate * -1
+      );
+    }
+    if (status) {
+      await setOrderList(selectSymbol);
+      await fetchData();
+      setError({
+        show: true,
+        message: "Successfully change order",
+        headermsg: "Success !!",
+      });
+    } else {
+      setError({
+        show: true,
+        message: "Fail to change order",
+        headermsg: "Error !!",
+      });
+    }
+    setChangeOrderLoading(false);
+  };
+
   const showDate = (time) => {
     const date = new Date(time * 1000);
     const year = date.getFullYear();
@@ -393,6 +442,22 @@ function Trading() {
       setFavorite(newFevorite);
       localStorage.setItem("favorite", JSON.stringify(newFevorite));
     }
+  };
+
+  const formatnumber = (number) => {
+    const str = `${number}`
+      .replace(",", "")
+      .replace(/[a-z]]/g, "")
+      .replace(/[A-Z]]/g, "");
+    const arr = str.split(".");
+    let output = "";
+    var num = arr[0].replace(/,/gi, "");
+    var num2 = num.split(/(?=(?:\d{3})+$)/).join(",");
+    output = num2;
+    if (arr.length > 1) {
+      output += "." + arr[1];
+    }
+    return output;
   };
 
   React.useEffect(() => {
@@ -806,7 +871,7 @@ function Trading() {
                           <tr className="text-center">
                             <td>
                               <i
-                                style={{ cursor: "pointer" }}
+                                style={{ cursor: "pointer", color: "#FFFF00" }}
                                 class="bi bi-star-fill"
                                 onClick={() => addFevorite(item.symbol, false)}
                               ></i>
@@ -881,6 +946,7 @@ function Trading() {
                           <th>Amount</th>
                           <th>receive</th>
                           <th>time</th>
+                          <th>change order</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -902,6 +968,47 @@ function Trading() {
                             }`}</td>
                             <td>{showDate(item.ts)}</td>
                             <td>
+                              {changeOrderLoading ? (
+                                <Spinner animation="border" />
+                              ) : (
+                                <>
+                                  <Button
+                                    active
+                                    variant="success"
+                                    onClick={() => {
+                                      changeOrder(
+                                        item.hash,
+                                        item.side,
+                                        item.rate,
+                                        item.amount,
+                                        0.1
+                                      );
+                                    }}
+                                    disabled={opentotrade}
+                                  >
+                                    + 0.1
+                                  </Button>
+                                  <Button
+                                    active
+                                    className="ml-set"
+                                    variant="danger"
+                                    onClick={() => {
+                                      changeOrder(
+                                        item.hash,
+                                        item.side,
+                                        item.rate,
+                                        item.amount,
+                                        -0.1
+                                      );
+                                    }}
+                                    disabled={opentotrade}
+                                  >
+                                    - 0.1
+                                  </Button>
+                                </>
+                              )}
+                            </td>
+                            <td>
                               <Button
                                 active
                                 variant="danger"
@@ -910,7 +1017,7 @@ function Trading() {
                                 }}
                                 disabled={opentotrade}
                               >
-                                cancle
+                                cancel
                               </Button>
                             </td>
                           </tr>
@@ -1044,7 +1151,7 @@ function Trading() {
                         <FormControl
                           aria-label="Amount (to the nearest dollar)"
                           className="text-center"
-                          value={inputValue1}
+                          value={formatnumber(inputValue1)}
                           onChange={(e) => changeInputVal(e.target.value, 0)}
                           type="text"
                         />
@@ -1064,7 +1171,7 @@ function Trading() {
                           <FormControl
                             aria-label="Amount (to the nearest dollar)"
                             className="text-center"
-                            value={selectmarket ? 0 : inputValue2}
+                            value={selectmarket ? 0 : formatnumber(inputValue2)}
                             onChange={(e) => changeInputVal(e.target.value, 1)}
                             disabled={selectmarket}
                             type="text"
@@ -1088,7 +1195,10 @@ function Trading() {
                         <FormControl
                           aria-label="Amount (to the nearest dollar)"
                           className="text-center"
-                          value={(selectmarket ? "≈" : "") + `${inputValue3}`}
+                          value={
+                            (selectmarket ? "≈" : "") +
+                            `${formatnumber(inputValue3)}`
+                          }
                           onChange={(e) => changeInputVal(e.target.value, 2)}
                           disabled
                         />
