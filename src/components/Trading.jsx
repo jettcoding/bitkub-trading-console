@@ -981,12 +981,12 @@ function Trading() {
                                         item.side,
                                         item.rate,
                                         item.amount,
-                                        0.1
+                                        0.01
                                       );
                                     }}
                                     disabled={opentotrade}
                                   >
-                                    + 0.1
+                                    + 0.01
                                   </Button>
                                   <Button
                                     active
@@ -998,12 +998,12 @@ function Trading() {
                                         item.side,
                                         item.rate,
                                         item.amount,
-                                        -0.1
+                                        -0.01
                                       );
                                     }}
                                     disabled={opentotrade}
                                   >
-                                    - 0.1
+                                    - 0.01
                                   </Button>
                                 </>
                               )}
