@@ -1,7 +1,9 @@
 import axios from "axios";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 const sendUrl =
-  "https://asia-southeast2-bitkub-console-f3fde.cloudfunctions.net/sendapi";
+  "http://localhost:5000/bitkub-console-f3fde/asia-southeast2/sendapi";
+// const sendUrl =
+//   "https://asia-southeast2-bitkub-console-f3fde.cloudfunctions.net/sendapi";
 const baseUrl = "https://api.bitkub.com";
 // const sercetkey = "733a93ec9d12af70183e54ac38c6ed2c";
 // const apikey = "5219186fce0d175eacb36f17ca5ad262";
@@ -78,7 +80,7 @@ export const buy = async (
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/place-bid",
+    url: baseUrl + "/api/market/v2/place-bid",
     headers: headers,
     data: data,
   });
@@ -111,7 +113,7 @@ export const sell = async (
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/place-ask",
+    url: baseUrl + "/api/market/v2/place-ask",
     headers: headers,
     data: data,
   });
@@ -153,7 +155,7 @@ export const deleteOrder = async (sercetkey, apikey, hash) => {
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/cancel-order",
+    url: baseUrl + "/api/market/v2/cancel-order",
     headers: headers,
     data: data,
   });
