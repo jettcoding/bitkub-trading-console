@@ -379,8 +379,8 @@ function Trading() {
     let status;
     const cal_rate = parseFloat(rate) + parseFloat(change);
     // console.log(side, rate, amount, change);
-    // console.log(cal_rate);
-    if (side === "BUY") {
+    console.log(cal_rate, side);
+    if (side.toLowerCase() === "buy") {
       status = await buy(
         selectSymbol,
         apiSecret,
@@ -806,8 +806,8 @@ function Trading() {
                         {wallet.map((item) => (
                           <tr className="text-center">
                             <td>{item[0]}</td>
-                            <td>{(item[1])}</td>
-                            <td>{(item[2])}</td>
+                            <td>{item[1]}</td>
+                            <td>{item[2]}</td>
                           </tr>
                         ))}
                       </tbody>

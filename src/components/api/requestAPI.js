@@ -1,11 +1,17 @@
 import axios from "axios";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 
-const sendUrl = "http://64.176.84.86/sendApi";
+const sendUrl = "https://64.176.84.86/sendApi";
 const baseUrl = "https://api.bitkub.com";
 
 export const getWallet = async (sercetkey, apikey) => {
-  const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/balances", "POST", {});
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/balances",
+    "POST",
+    {}
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -56,14 +62,27 @@ export const getPrice = async (symbol) => {
   return response.data[symbol];
 };
 
-export const buy = async (symbol, sercetkey, apikey, type, amount, rate = 0) => {
+export const buy = async (
+  symbol,
+  sercetkey,
+  apikey,
+  type,
+  amount,
+  rate = 0
+) => {
   const formattedSymbol = formatSymbol(symbol);
-  const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/place-bid", "POST", {
-    sym: formattedSymbol,
-    amt: amount,
-    rat: type === "limit" ? rate : 0,
-    typ: type,
-  });
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/place-bid",
+    "POST",
+    {
+      sym: formattedSymbol,
+      amt: `${amount}`,
+      rat: `${type === "limit" ? rate : 0}`,
+      typ: type,
+    }
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -84,14 +103,27 @@ export const buy = async (symbol, sercetkey, apikey, type, amount, rate = 0) => 
   }
 };
 
-export const sell = async (symbol, sercetkey, apikey, type, amount, rate = 0) => {
+export const sell = async (
+  symbol,
+  sercetkey,
+  apikey,
+  type,
+  amount,
+  rate = 0
+) => {
   const formattedSymbol = formatSymbol(symbol);
-  const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/place-ask", "POST", {
-    sym: formattedSymbol,
-    amt: amount,
-    rat: type === "limit" ? rate : 0,
-    typ: type,
-  });
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/place-ask",
+    "POST",
+    {
+      sym: formattedSymbol,
+      amt: `${amount}`,
+      rat: `${type === "limit" ? rate : 0}`,
+      typ: type,
+    }
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -114,7 +146,12 @@ export const sell = async (symbol, sercetkey, apikey, type, amount, rate = 0) =>
 
 export const orderList = async (sercetkey, apikey, symbol) => {
   const formattedSymbol = formatSymbol(symbol);
-  const { ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/my-open-orders?sym=" + formattedSymbol, "GET");
+  const { ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/my-open-orders?sym=" + formattedSymbol,
+    "GET"
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -131,9 +168,15 @@ export const orderList = async (sercetkey, apikey, symbol) => {
 };
 
 export const deleteOrder = async (sercetkey, apikey, hash) => {
-  const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/cancel-order", "POST", {
-    hash: hash,
-  });
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/cancel-order",
+    "POST",
+    {
+      hash: hash,
+    }
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -161,14 +204,16 @@ const hashData = async (sercetkey, apikey, path, method, input_data = {}) => {
   });
   const timestamp = serverTsResponse.data;
 
-  let query = '';
+  let query = "";
   let data = input_data;
   if (method === "GET") {
     query = new URLSearchParams(input_data).toString();
     data = {}; // GET requests typically don't have a body
   }
 
-  const payload = `${timestamp}${method}${path}${query}${(method === "POST" ? JSON.stringify(data) : "")}`;
+  const payload = `${timestamp}${method}${path}${query}${
+    method === "POST" ? JSON.stringify(data) : ""
+  }`;
   console.log(payload);
   const hmacDigest = hmacSHA256(payload, sercetkey).toString();
 
