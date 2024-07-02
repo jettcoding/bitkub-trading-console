@@ -114,9 +114,7 @@ export const sell = async (symbol, sercetkey, apikey, type, amount, rate = 0) =>
 
 export const orderList = async (sercetkey, apikey, symbol) => {
   const formattedSymbol = formatSymbol(symbol);
-  const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/my-open-orders", "GET", {
-    sym: formattedSymbol,
-  });
+  const { ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/my-open-orders?sym=" + formattedSymbol, "GET");
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -170,7 +168,8 @@ const hashData = async (sercetkey, apikey, path, method, input_data = {}) => {
     data = {}; // GET requests typically don't have a body
   }
 
-  const payload = `${timestamp}${method}${path}${query}${JSON.stringify(data)}`;
+  const payload = `${timestamp}${method}${path}${query}${(method === "POST" ? JSON.stringify(data) : "")}`;
+  console.log(payload);
   const hmacDigest = hmacSHA256(payload, sercetkey).toString();
 
   return {
