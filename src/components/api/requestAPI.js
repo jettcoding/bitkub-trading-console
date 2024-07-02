@@ -1,7 +1,7 @@
 import axios from "axios";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 
-const sendUrl = "http://0.0.0.0:80/sendApi";
+const sendUrl = "/sendApi";
 const baseUrl = "https://api.bitkub.com";
 
 export const getWallet = async (sercetkey, apikey) => {
