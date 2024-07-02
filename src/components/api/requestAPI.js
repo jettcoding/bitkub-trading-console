@@ -1,23 +1,27 @@
 import axios from "axios";
 import hmacSHA256 from "crypto-js/hmac-sha256";
-const sendUrl =
-  "http://localhost:5000/bitkub-console-f3fde/asia-southeast2/sendapi";
-// const sendUrl =
-//   "https://asia-southeast2-bitkub-console-f3fde.cloudfunctions.net/sendapi";
+
+const sendUrl = "http://0.0.0.0:80/sendApi";
 const baseUrl = "https://api.bitkub.com";
-// const sercetkey = "733a93ec9d12af70183e54ac38c6ed2c";
-// const apikey = "5219186fce0d175eacb36f17ca5ad262";
 
 export const getWallet = async (sercetkey, apikey) => {
-  const data = await hashData(sercetkey);
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/balances",
+    "POST",
+    {}
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-BTK-APIKEY": apikey,
+    "X-BTK-TIMESTAMP": ts,
+    "X-BTK-SIGN": sig,
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/balances",
+    url: baseUrl + "/api/v3/market/balances",
     headers: headers,
     data: data,
   });
@@ -43,20 +47,19 @@ export const getWallet = async (sercetkey, apikey) => {
 };
 
 export const getList = async () => {
-  const res = await axios.post(sendUrl, {
+  const response = await axios.post(sendUrl, {
     method: "GET",
     url: baseUrl + "/api/market/symbols",
   });
-  return res.data.data.result;
+  return response.data.result;
 };
 
 export const getPrice = async (symbol) => {
-  const res = await axios.post(sendUrl, {
+  const response = await axios.post(sendUrl, {
     method: "GET",
     url: baseUrl + "/api/market/ticker?sym=" + symbol,
   });
-  //   console.log(res.data);
-  return res.data.data[symbol];
+  return response.data[symbol];
 };
 
 export const buy = async (
@@ -67,24 +70,32 @@ export const buy = async (
   amount,
   rate = 0
 ) => {
-  const data = await hashData(sercetkey, {
-    sym: symbol,
-    amt: amount,
-    rat: type === "limit" ? rate : 0,
-    typ: type,
-  });
+  const formattedSymbol = formatSymbol(symbol);
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/place-bid",
+    "POST",
+    {
+      sym: formattedSymbol,
+      amt: `${amount}`,
+      rat: `${type === "limit" ? rate : 0}`,
+      typ: type,
+    }
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-BTK-APIKEY": apikey,
+    "X-BTK-TIMESTAMP": ts,
+    "X-BTK-SIGN": sig,
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/v2/place-bid",
+    url: baseUrl + "/api/v3/market/place-bid",
     headers: headers,
     data: data,
   });
-  //   console.log(response.data);
   if (response.data.error === 0) {
     return true;
   } else {
@@ -100,24 +111,32 @@ export const sell = async (
   amount,
   rate = 0
 ) => {
-  const data = await hashData(sercetkey, {
-    sym: symbol,
-    amt: amount,
-    rat: type === "limit" ? rate : 0,
-    typ: type,
-  });
+  const formattedSymbol = formatSymbol(symbol);
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/place-ask",
+    "POST",
+    {
+      sym: formattedSymbol,
+      amt: `${amount}`,
+      rat: `${type === "limit" ? rate : 0}`,
+      typ: type,
+    }
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-BTK-APIKEY": apikey,
+    "X-BTK-TIMESTAMP": ts,
+    "X-BTK-SIGN": sig,
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/v2/place-ask",
+    url: baseUrl + "/api/v3/market/place-ask",
     headers: headers,
     data: data,
   });
-  //   console.log(response.data);
   if (response.data.error === 0) {
     return true;
   } else {
@@ -126,40 +145,51 @@ export const sell = async (
 };
 
 export const orderList = async (sercetkey, apikey, symbol) => {
-  const data = await hashData(sercetkey, {
-    sym: symbol,
-  });
+  const formattedSymbol = formatSymbol(symbol);
+  const { ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/my-open-orders?sym=" + formattedSymbol,
+    "GET"
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-BTK-APIKEY": apikey,
+    "X-BTK-TIMESTAMP": ts,
+    "X-BTK-SIGN": sig,
   };
   const response = await axios.post(sendUrl, {
-    method: "POST",
-    url: baseUrl + "/api/market/my-open-orders",
+    method: "GET",
+    url: baseUrl + "/api/v3/market/my-open-orders?sym=" + formattedSymbol,
     headers: headers,
-    data: data,
   });
-  // console.log(response.data);
   return response.data.result;
 };
 
 export const deleteOrder = async (sercetkey, apikey, hash) => {
-  const data = await hashData(sercetkey, {
-    hash: hash,
-  });
+  const { data, ts, sig } = await hashData(
+    sercetkey,
+    apikey,
+    "/api/v3/market/cancel-order",
+    "POST",
+    {
+      hash: hash,
+    }
+  );
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-BTK-APIKEY": apikey,
+    "X-BTK-TIMESTAMP": ts,
+    "X-BTK-SIGN": sig,
   };
   const response = await axios.post(sendUrl, {
     method: "POST",
-    url: baseUrl + "/api/market/v2/cancel-order",
+    url: baseUrl + "/api/v3/market/cancel-order",
     headers: headers,
     data: data,
   });
-  // console.log(response.data);
   if (response.data.error === 0) {
     return true;
   } else {
@@ -167,18 +197,34 @@ export const deleteOrder = async (sercetkey, apikey, hash) => {
   }
 };
 
-const hashData = async (sercetkey, input_data = {}) => {
-  const serverTs = await axios.post(sendUrl, {
+const hashData = async (sercetkey, apikey, path, method, input_data = {}) => {
+  const serverTsResponse = await axios.post(sendUrl, {
     method: "GET",
-    url: baseUrl + "/api/servertime",
+    url: baseUrl + "/api/v3/servertime",
   });
-  let data = {
-    ...input_data,
-    ts: serverTs.data.data,
-  };
-  const hmacDigest = hmacSHA256(JSON.stringify(data), sercetkey).toString();
+  const timestamp = serverTsResponse.data;
+
+  let query = "";
+  let data = input_data;
+  if (method === "GET") {
+    query = new URLSearchParams(input_data).toString();
+    data = {}; // GET requests typically don't have a body
+  }
+
+  const payload = `${timestamp}${method}${path}${query}${
+    method === "POST" ? JSON.stringify(data) : ""
+  }`;
+  console.log(payload);
+  const hmacDigest = hmacSHA256(payload, sercetkey).toString();
+
   return {
-    ...data,
+    data,
+    ts: timestamp,
     sig: hmacDigest,
   };
+};
+
+const formatSymbol = (symbol) => {
+  const [base, quote] = symbol.split("_");
+  return `${quote.toLowerCase()}_${base.toLowerCase()}`;
 };
