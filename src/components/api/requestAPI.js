@@ -57,8 +57,9 @@ export const getPrice = async (symbol) => {
 };
 
 export const buy = async (symbol, sercetkey, apikey, type, amount, rate = 0) => {
+  const formattedSymbol = formatSymbol(symbol);
   const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/place-bid", "POST", {
-    sym: symbol,
+    sym: formattedSymbol,
     amt: amount,
     rat: type === "limit" ? rate : 0,
     typ: type,
@@ -84,8 +85,9 @@ export const buy = async (symbol, sercetkey, apikey, type, amount, rate = 0) => 
 };
 
 export const sell = async (symbol, sercetkey, apikey, type, amount, rate = 0) => {
+  const formattedSymbol = formatSymbol(symbol);
   const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/place-ask", "POST", {
-    sym: symbol,
+    sym: formattedSymbol,
     amt: amount,
     rat: type === "limit" ? rate : 0,
     typ: type,
@@ -111,8 +113,9 @@ export const sell = async (symbol, sercetkey, apikey, type, amount, rate = 0) =>
 };
 
 export const orderList = async (sercetkey, apikey, symbol) => {
-  const { ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/my-open-orders", "GET", {
-    sym: symbol,
+  const formattedSymbol = formatSymbol(symbol);
+  const { data, ts, sig } = await hashData(sercetkey, apikey, "/api/v3/market/my-open-orders", "GET", {
+    sym: formattedSymbol,
   });
   const headers = {
     "Content-Type": "application/json",
@@ -123,7 +126,7 @@ export const orderList = async (sercetkey, apikey, symbol) => {
   };
   const response = await axios.post(sendUrl, {
     method: "GET",
-    url: baseUrl + "/api/v3/market/my-open-orders?sym=" + symbol,
+    url: baseUrl + "/api/v3/market/my-open-orders?sym=" + formattedSymbol,
     headers: headers,
   });
   return response.data.result;
@@ -175,4 +178,9 @@ const hashData = async (sercetkey, apikey, path, method, input_data = {}) => {
     ts: timestamp,
     sig: hmacDigest,
   };
+};
+
+const formatSymbol = (symbol) => {
+  const [base, quote] = symbol.split("_");
+  return `${quote.toLowerCase()}_${base.toLowerCase()}`;
 };
