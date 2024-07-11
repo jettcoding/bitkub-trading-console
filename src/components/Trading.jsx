@@ -806,8 +806,8 @@ function Trading() {
                         {wallet.map((item) => (
                           <tr className="text-center">
                             <td>{item[0]}</td>
-                            <td>{item[1]}</td>
-                            <td>{item[2]}</td>
+                            <td>{formatter.format(item[1])}</td>
+                            <td>{formatter.format(item[2])}</td>
                           </tr>
                         ))}
                       </tbody>
