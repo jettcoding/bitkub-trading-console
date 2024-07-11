@@ -24,6 +24,7 @@ import {
   orderList,
   deleteOrder,
 } from "./api/requestAPI";
+import moment from "moment";
 
 function Trading() {
   var formatter = new Intl.NumberFormat("en-US");
@@ -418,15 +419,17 @@ function Trading() {
   };
 
   const showDate = (time) => {
-    const date = new Date(time * 1000);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hour = date.getHours();
-    const min = date.getMinutes();
-    const sec = date.getSeconds();
-    const timeStr = `${year}-${month}-${day} ${hour}:${min}:${sec}`;
-    return timeStr;
+    // console.log(time);
+    // const date = new Date(time * 1000);
+    // const year = date.getFullYear();
+    // const month = date.getMonth() + 1;
+    // const day = date.getDate();
+    // const hour = date.getHours();
+    // const min = date.getMinutes();
+    // const sec = date.getSeconds();
+    // const timeStr = `${year}-${month}-${day} ${hour}:${min}:${sec}`;
+    const str = moment(time).format("DD-MM-YYYY HH:mm:ss");
+    return str;
   };
 
   const addFevorite = async (symbol, check) => {
@@ -806,8 +809,8 @@ function Trading() {
                         {wallet.map((item) => (
                           <tr className="text-center">
                             <td>{item[0]}</td>
-                            <td>{item[1]}</td>
-                            <td>{item[2]}</td>
+                            <td>{formatnumber(item[1])}</td>
+                            <td>{formatnumber(item[2])}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -958,12 +961,12 @@ function Trading() {
                             <td>{`${formatter.format(item.rate)} THB`}</td>
                             <td>{`${formatter.format(item.amount)} ${
                               selectSymbol.split("_")[
-                                item.side === "SELL" ? 1 : 0
+                                item.side === "sell" ? 1 : 0
                               ]
                             }`}</td>
                             <td>{`${formatter.format(item.receive)} ${
                               selectSymbol.split("_")[
-                                item.side === "SELL" ? 0 : 1
+                                item.side === "sell" ? 0 : 1
                               ]
                             }`}</td>
                             <td>{showDate(item.ts)}</td>
