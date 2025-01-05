@@ -78,7 +78,7 @@ export const buy = async (
     "POST",
     {
       sym: formattedSymbol,
-      amt: amount,
+      amt: Number(amount),
       rat: type === "limit" ? parseFloat(rate) : 0,
       typ: type,
     }
@@ -119,7 +119,7 @@ export const sell = async (
     "POST",
     {
       sym: formattedSymbol,
-      amt: amount,
+      amt: Number(amount),
       rat: type === "limit" ? parseFloat(rate) : 0,
       typ: type,
     }
